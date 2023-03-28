@@ -33,6 +33,7 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     private MeshRenderer meshRenderer;
     private Explosive explosive;
     private float speed;
+    private bool isOperable;
 
     public event Action<Vector3> onChangePosition;
 
@@ -40,9 +41,7 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     public void Construct(UserInput userInput, Explosive explosive)
     {
         userInput.onTouch += Steer;
-        explosive.onExplode += OnExplode;
     }
-
 
     private void Awake()
     {
@@ -64,20 +63,34 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
 
     private void Steer(Vector2 touchDelta)
     {
-        rb.velocity = speed * touchDelta.normalized;
+        if (!isOperable) return;
+
+        var direction = touchDelta.normalized;
+        transform.LookAt(direction);
+        rb.velocity = speed * direction;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.otherCollider.TryGetComponent(out Missile missile))
         {
-            explosive.Explode();
+            Explode();
         }
     }
 
-    private void OnExplode()
+    private void Explode()
     {
+        explosive.Explode();
+
         meshRenderer.enabled = false;
+        isOperable = false;
+        rb.velocity = Vector2.zero;
+    }
+
+    private void Repair()
+    {
+        meshRenderer.enabled = true;
+        isOperable = true;
     }
 }
 
@@ -109,12 +122,20 @@ public class Missile : MonoBehaviour
     private Rigidbody2D rb;
     private float speed;
 
+    public event Action onHitMissile;
+
+    /// TODO: Спавнить ракеты через фабрику Zenject, использующую пул UniRx
+    /// Добавить Coin и CoinSpawner
+    /// ДОбавить Plane.Repair()
+    /// Скорее всего понадобится проверять touchDeltaPosition.magnitude в UserInput, чтобы понизить чувствительность джойстика
+    /// Написать контекст зенжекта
 
     // [Inject]
-    public void Construct(ILockOnTarget plane, Explosive explosive)
+    public void Construct(ILockOnTarget plane, Explosive explosive, CoinSpawner coinSpawner)
     {
         plane.onChangePosition += Home;
         explosive.onExplode += OnExplode;
+        onHitMissile += coinSpawner.Spawn();
     }
 
     private void Awake()
@@ -147,7 +168,13 @@ public class Missile : MonoBehaviour
         if (collision.otherCollider.TryGetComponent(out Missile missile))
         {
             explosive.Explode();
+            onHitMissile?.Invoke();
         }
+        else if (collision.otherCollider.TryGetComponent(out Plane plane))
+        {
+            explosive.Explode();
+        }
+
     }
 
     private void OnExplode()
