@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 public class Explosive : MonoBehaviour
 {
-    [SerializeField] private ParticleSystem explosionPS;
+    [Inject] private ParticleSystem explosionPS;
 
     public event Action onExplode;
 

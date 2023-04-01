@@ -1,3 +1,4 @@
+using UnityEngine;
 using Zenject;
 
 public class MainInstaller : MonoInstaller
@@ -12,6 +13,12 @@ public class MainInstaller : MonoInstaller
             .AsSingle();
 
         Container
+            .Bind<ParticleSystem>()
+            .FromMethod(()=> FindObjectOfType<ParticleSystem>())
+            .WhenInjectedInto<Explosive>()
+            .Lazy();
+
+        Container
             .Bind<Missile.ILockOnTarget>()
             .FromComponentInHierarchy()
             .WhenInjectedInto<Missile>()
@@ -23,11 +30,12 @@ public class MainInstaller : MonoInstaller
 
         Container
             .BindFactory<Missile, Missile.Factory>()
-            .FromComponentInNewPrefabResource("Prefabs/PlayerPrefab")
-            .AsTransient();
+            .FromComponentInNewPrefabResource("Missile")
+            .AsTransient()
+            .Lazy();
         Container
-            .Bind<Missile.Factory>()
-            .FromResolve()
+            .Bind<Missile.MissilePool>()
+            .FromNew()
             .AsSingle();
     }
 }

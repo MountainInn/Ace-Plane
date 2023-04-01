@@ -1,9 +1,10 @@
 using UnityEngine;
+using Zenject;
 
 public class MissileSpawner : MonoBehaviour
 {
-    Missile.MissilePool missilePool;
-    Plane plane;
+    [Inject] Missile.MissilePool missilePool;
+    [Inject] Plane plane;
 
     float spawnRadius;
     float t = 0, interval = 3;
@@ -17,7 +18,7 @@ public class MissileSpawner : MonoBehaviour
         gameObject.AddComponent<GameSettingsWatcher>()
             .onUpdate += () =>
             {
-                spawnRadius = gameSettings.planeSpeed;
+                spawnRadius = gameSettings.missileSpawnRadius;
             };
 #endif
     }
@@ -30,12 +31,11 @@ public class MissileSpawner : MonoBehaviour
 
             var missile = missilePool.Rent();
 
-            Vector2 circlePosition = Random.insideUnitCircle.normalized * spawnRadius;
+            Vector2 circlePosition = Random.insideUnitCircle.normalized ;
 
             missile.transform.position =
-                plane.transform.position + new Vector3(circlePosition.x,
-                                                       0,
-                                                       circlePosition.y);
+                plane.transform.position
+                + new Vector3(circlePosition.x, circlePosition.y, 0)* spawnRadius;
         }
     }
 }

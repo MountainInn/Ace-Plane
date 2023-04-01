@@ -8,9 +8,9 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     private MeshRenderer meshRenderer;
     private Explosive explosive;
     private float speed;
+    private Vector2 direction = Vector2.up;
+    private Quaternion rot;
     private bool isOperable;
-
-    public event Action<Vector3> onChangePosition;
 
     [Inject]
     public void Construct(UserInput userInput, Explosive explosive)
@@ -37,13 +37,20 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
 #endif
     }
 
-    private void Steer(Vector2 touchDelta)
+    private void FixedUpdate()
     {
-        if (!isOperable) return;
+        rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rot, 360 * Time.fixedDeltaTime));
+    }
 
-        var direction = touchDelta.normalized;
-        transform.LookAt(direction);
+    private void Steer(Vector3 touchDelta)
+    {
+        if (isOperable) return;
+
+        direction = touchDelta.normalized;
+
         rb.velocity = speed * direction;
+
+        rot = Quaternion.LookRotation(Vector3.forward, direction);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -67,5 +74,6 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     {
         meshRenderer.enabled = true;
         isOperable = true;
+        rb.velocity = direction * speed;
     }
 }

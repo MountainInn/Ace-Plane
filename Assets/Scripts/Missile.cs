@@ -8,9 +8,9 @@ public class Missile : MonoBehaviour
 {
     public interface ILockOnTarget
     {
-        event Action<Vector3> onChangePosition;
     }
 
+    private Transform target;
     private Explosive explosive;
     private Rigidbody2D rb;
     private float speed;
@@ -22,11 +22,14 @@ public class Missile : MonoBehaviour
     /// TODO: Скорее всего понадобится проверять touchDeltaPosition.magnitude в UserInput, чтобы понизить чувствительность джойстика
 
     [Inject]
-    public void Construct(ILockOnTarget plane, Explosive explosive, CoinSpawner coinSpawner)
+    public void Construct(ILockOnTarget plane, Explosive explosive, CoinSpawner coinSpawner, MissilePool missilePool)
     {
         this.explosive = explosive;
-        plane.onChangePosition += Home;
+        explosive.onExplode += () => missilePool.Return(this);
+
         onHitMissile += coinSpawner.Spawn;
+
+        target = ((MonoBehaviour) plane).transform;
     }
 
     private void Awake()
@@ -46,9 +49,16 @@ public class Missile : MonoBehaviour
 #endif
     }
 
-    private void Home(Vector3 newPosition)
+    private void Update()
     {
-        var direction = (newPosition - transform.position).normalized;
+        if (target is null) return;
+
+        Home();
+    }
+
+    private void Home()
+    {
+        var direction = (target.position - transform.position).normalized;
         var force = speed * direction;
         rb.AddForce(force, ForceMode2D.Force);
     }
@@ -84,22 +94,11 @@ public class Missile : MonoBehaviour
         {
             var newMissile = missileFactory.Create();
 
-            newMissile.explosive.onExplode += () => Return(newMissile);
-
             return newMissile;
         }
     }
 
     public class Factory : PlaceholderFactory<Missile>
     {
-        [Inject]
-        Missile prefab;
-
-        public override Missile Create()
-        {
-            var missile = Instantiate(prefab);
-
-            return missile;
-        }
     }
 }
