@@ -14,12 +14,14 @@ public class UserInput : MonoBehaviour
         {
             Vector3 mousePosition = Input.mousePosition;
 
-            deltaPosition = mousePosition - pastFramePosition;
+            var newDeltaPosition = mousePosition - pastFramePosition;
 
-            if (deltaPosition.magnitude < 15f)
+            if (newDeltaPosition.magnitude < 10f)
             {
                 return;
             }
+
+            deltaPosition = newDeltaPosition;
            
             pastFramePosition = mousePosition;
 

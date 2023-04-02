@@ -5,12 +5,12 @@ using Zenject;
 public class Plane : MonoBehaviour, Missile.ILockOnTarget
 {
     private Rigidbody2D rb;
-    private MeshRenderer meshRenderer;
+    private SpriteRenderer spriteRenderer;
     private Explosive explosive;
     private float speed;
     private Vector2 direction = Vector2.up;
     private Quaternion rot;
-    private bool isOperable;
+    private bool isOperable = true;
 
     [Inject]
     public void Construct(UserInput userInput, Explosive explosive)
@@ -22,7 +22,7 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        meshRenderer = GetComponent<MeshRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         explosive = GetComponent<Explosive>();
 
         var gameSettings = GameSettings.Get();
@@ -39,23 +39,25 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
 
     private void FixedUpdate()
     {
+        if (!isOperable) return;
+
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rot, 360 * Time.fixedDeltaTime));
+
+        rb.velocity = speed * transform.up;
     }
 
     private void Steer(Vector3 touchDelta)
     {
-        if (isOperable) return;
+        if (!isOperable) return;
 
         direction = touchDelta.normalized;
-
-        rb.velocity = speed * direction;
 
         rot = Quaternion.LookRotation(Vector3.forward, direction);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D col)
     {
-        if (collision.otherCollider.TryGetComponent(out Missile missile))
+        if (col.TryGetComponent(out Missile missile))
         {
             Explode();
         }
@@ -65,15 +67,19 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     {
         explosive.Explode();
 
-        meshRenderer.enabled = false;
-        isOperable = false;
-        rb.velocity = Vector2.zero;
+        // spriteRenderer.enabled = false;
+        // isOperable = false;
+        // rb.velocity = Vector2.zero;
+
+        // Time.timeScale = 0f;
     }
 
     private void Repair()
     {
-        meshRenderer.enabled = true;
-        isOperable = true;
-        rb.velocity = direction * speed;
+        // spriteRenderer.enabled = true;
+        // isOperable = true;
+        // rb.velocity = direction * speed;
+
+        // Time.timeScale = 1f;
     }
 }

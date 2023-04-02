@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b932d490d0b7fb34caa54d39913b5fd0, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  planeSpeed: 3
-  missileSpeed: 2
-  missileSpawnRadius: 10
+  planeSpeed: 12
+  missileSpeed: 8
+  missileSpawnRadius: 20

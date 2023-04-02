@@ -31,11 +31,21 @@ public class MainInstaller : MonoInstaller
         Container
             .BindFactory<Missile, Missile.Factory>()
             .FromComponentInNewPrefabResource("Missile")
-            .AsTransient()
+            .AsCached()
             .Lazy();
         Container
             .Bind<Missile.MissilePool>()
             .FromNew()
-            .AsSingle();
+            .AsCached();
+
+        Container
+            .BindFactory<MissileTrail, MissileTrail.Factory>()
+            .FromComponentInNewPrefabResource("MissileTrail")
+            .AsCached()
+            .NonLazy();
+        Container
+            .Bind<MissileTrail.Pool>()
+            .FromNew()
+            .AsCached();
     }
 }

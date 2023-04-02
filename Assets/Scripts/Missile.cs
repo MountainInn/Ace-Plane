@@ -13,21 +13,17 @@ public class Missile : MonoBehaviour
     private Transform target;
     private Explosive explosive;
     private Rigidbody2D rb;
+    private CoinSpawner coinSpawner;
+    private MissilePool missilePool;
+    private MissileTrail.Pool trailPool;
     private float speed;
 
-    public event Action onHitMissile;
-
-    /// TODO: Добавить Coin и CoinSpawner
-    /// TODO: ДОбавить Plane.Repair()
-    /// TODO: Скорее всего понадобится проверять touchDeltaPosition.magnitude в UserInput, чтобы понизить чувствительность джойстика
-
     [Inject]
-    public void Construct(ILockOnTarget plane, Explosive explosive, CoinSpawner coinSpawner, MissilePool missilePool)
+    public void Construct(ILockOnTarget plane, Explosive explosive, CoinSpawner coinSpawner, MissilePool missilePool, MissileTrail.Pool trailPool)
     {
         this.explosive = explosive;
-        explosive.onExplode += () => missilePool.Return(this);
-
-        onHitMissile += coinSpawner.Spawn;
+        this.missilePool = missilePool;
+        this.trailPool = trailPool;
 
         target = ((MonoBehaviour) plane).transform;
     }
@@ -56,6 +52,11 @@ public class Missile : MonoBehaviour
         Home();
     }
 
+    private void OnEnable()
+    {
+        trailPool.Rent().SetMissile(this);
+    }
+
     private void Home()
     {
         var direction = (target.position - transform.position).normalized;
@@ -64,14 +65,13 @@ public class Missile : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D col)
     {
-        if (collision.otherCollider.TryGetComponent(out Missile missile))
+        if (col.TryGetComponent(out Missile missile))
         {
-            onHitMissile?.Invoke();
             Explode();
         }
-        else if (collision.otherCollider.TryGetComponent(out Plane plane))
+        else if (col.TryGetComponent(out Plane plane))
         {
             Explode();
         }
@@ -81,6 +81,8 @@ public class Missile : MonoBehaviour
     private void Explode()
     {
         explosive.Explode();
+
+        missilePool.Return(this);
     }
 
 

@@ -29,13 +29,18 @@ public class MissileSpawner : MonoBehaviour
         {
             t -= interval;
 
-            var missile = missilePool.Rent();
-
-            Vector2 circlePosition = Random.insideUnitCircle.normalized ;
-
-            missile.transform.position =
-                plane.transform.position
-                + new Vector3(circlePosition.x, circlePosition.y, 0)* spawnRadius;
+            Spawn();
         }
+    }
+
+    private void Spawn()
+    {
+        var missile = missilePool.Rent();
+
+        Vector2 circlePosition = Random.insideUnitCircle.normalized;
+
+        missile.transform.position =
+            plane.transform.position
+            + new Vector3(circlePosition.x, circlePosition.y, 0) * spawnRadius;
     }
 }
