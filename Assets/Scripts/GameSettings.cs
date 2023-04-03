@@ -7,7 +7,10 @@ public class GameSettings : ScriptableObject
     static private GameSettings inst;
 
     [SerializeField] public float planeSpeed;
-    [SpaceAttribute]
+    [Space]
     [SerializeField] public float missileSpeed;
     [SerializeField] public float missileSpawnRadius;
+    [Space]
+    [SerializeField] public float secondsToFever;
+    [SerializeField] public float feverDuration;
 }
