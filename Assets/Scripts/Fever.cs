@@ -1,10 +1,13 @@
 using System;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class Fever : MonoBehaviour
 {
     CircleCollider2D trigger;
     Image indicator;
 
+    int missilesInRange;
     float
         secondsToFever,
         feverDuration,
