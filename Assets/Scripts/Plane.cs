@@ -1,9 +1,13 @@
 using System;
 using UnityEngine;
 using Zenject;
+using System.Runtime.InteropServices;
 
 public class Plane : MonoBehaviour, Missile.ILockOnTarget
 {
+    [DllImport("__Internal")]
+    private static extern void Hello();
+
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private Explosive explosive;
@@ -35,6 +39,12 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
                 speed = gameSettings.planeSpeed;
             };
 #endif
+    }
+
+    public void PlaneInitCallback()
+    {
+        Debug.Log($"+++++++++++Plane Init Callabckckcc");
+        Hello();
     }
 
     private void FixedUpdate()
