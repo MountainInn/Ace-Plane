@@ -10,20 +10,31 @@ public class Missile : MonoBehaviour
     {
     }
 
-    private Transform target;
-    private Explosive explosive;
     private Rigidbody2D rb;
-    private CoinSpawner coinSpawner;
-    private MissilePool missilePool;
-    private MissileTrail.Pool trailPool;
     private float speed;
 
+    private Transform target;
+    private CoinSpawner coinSpawner;
+    private ExplosionSpawner explosionSpawner;
+    private AutoDestruct autoDestruct;
+    private MissilePool missilePool;
+    private MissileTrail.Pool trailPool;
+
     [Inject]
-    public void Construct(ILockOnTarget plane, Explosive explosive, CoinSpawner coinSpawner, MissilePool missilePool, MissileTrail.Pool trailPool)
+    public void Construct(Plane plane,
+                          CoinSpawner coinSpawner,
+                          MissilePool missilePool,
+                          ExplosionSpawner explosionSpawner,
+                          MissileTrail.Pool trailPool,
+                          AutoDestruct autoDestruct)
     {
-        this.explosive = explosive;
         this.missilePool = missilePool;
         this.trailPool = trailPool;
+        this.coinSpawner = coinSpawner;
+        this.explosionSpawner = explosionSpawner;
+        this.autoDestruct = autoDestruct;
+
+        autoDestruct.onAutoDestruct += ExplodeWithCoin;
 
         target = ((MonoBehaviour) plane).transform;
     }
@@ -31,7 +42,6 @@ public class Missile : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        explosive = GetComponent<Explosive>();
 
         var gameSettings = GameSettings.Get();
         speed = gameSettings.missileSpeed;
@@ -69,7 +79,7 @@ public class Missile : MonoBehaviour
     {
         if (col.TryGetComponent(out Missile missile))
         {
-            Explode();
+            ExplodeWithCoin();
         }
         else if (col.TryGetComponent(out Plane plane))
         {
@@ -78,9 +88,15 @@ public class Missile : MonoBehaviour
 
     }
 
-    private void Explode()
+    void ExplodeWithCoin()
     {
-        explosive.Explode();
+        Explode();
+        coinSpawner.Spawn(transform.position);
+    }
+
+    public void Explode()
+    {
+        explosionSpawner.Spawn(transform.position);
 
         missilePool.Return(this);
     }

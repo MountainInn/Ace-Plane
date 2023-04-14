@@ -2,24 +2,25 @@ using System;
 using UnityEngine;
 using Zenject;
 using System.Runtime.InteropServices;
+using UniRx;
 
 public class Plane : MonoBehaviour, Missile.ILockOnTarget
 {
+    [Inject] private ExplosionSpawner explosionSpawner;
+
     [DllImport("__Internal")]
     private static extern void Hello();
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    private Explosive explosive;
     private float speed;
     private Vector2 direction = Vector2.up;
     private Quaternion rot;
     private bool isOperable = true;
 
     [Inject]
-    public void Construct(UserInput userInput, Explosive explosive)
+    public void Construct(UserInput userInput)
     {
-        this.explosive = explosive;
         userInput.onTouch += Steer;
     }
 
@@ -27,7 +28,6 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        explosive = GetComponent<Explosive>();
 
         var gameSettings = GameSettings.Get();
         speed = gameSettings.planeSpeed;
@@ -51,18 +51,19 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     {
         if (!isOperable) return;
 
-        rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rot, 360 * Time.fixedDeltaTime));
+        rb.MoveRotation(
+            Quaternion.RotateTowards(transform.rotation, rot, 360 * Time.fixedDeltaTime));
 
         rb.velocity = speed * transform.up;
     }
 
-    private void Steer(Vector3 touchDelta)
+    public void Steer(Vector3 inputDirection)
     {
         if (!isOperable) return;
 
-        direction = touchDelta.normalized;
+        this.direction = inputDirection;
 
-        rot = Quaternion.LookRotation(Vector3.forward, direction);
+        rot = Quaternion.LookRotation(Vector3.forward, this.direction);
     }
 
     private void OnTriggerEnter2D(Collider2D col)
@@ -73,23 +74,23 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
         }
     }
 
-    private void Explode()
+    public void Explode()
     {
-        explosive.Explode();
+        explosionSpawner.Spawn(transform.position);
 
-        // spriteRenderer.enabled = false;
-        // isOperable = false;
-        // rb.velocity = Vector2.zero;
+        spriteRenderer.enabled = false;
+        isOperable = false;
+        rb.simulated = false;
 
-        // Time.timeScale = 0f;
+        MessageBroker.Default.Publish(new msgExploded{});
     }
 
-    private void Repair()
+    public void Repair()
     {
-        // spriteRenderer.enabled = true;
-        // isOperable = true;
-        // rb.velocity = direction * speed;
-
-        // Time.timeScale = 1f;
+        spriteRenderer.enabled = true;
+        isOperable = true;
+        rb.simulated = true;
     }
+
+    public struct msgExploded {}
 }

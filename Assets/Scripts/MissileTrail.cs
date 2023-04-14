@@ -5,15 +5,15 @@ using System;
 
 public class MissileTrail : MonoBehaviour
 {
-    private Missile missile;
-    private TrailRenderer trail;
+    Missile missile;
+    TrailRenderer trail;
 
     [Inject]
-    private Pool pool;
+    Pool pool;
 
     Action update;
 
-    private void Awake()
+    void Awake()
     {
         trail = GetComponent<TrailRenderer>();
         update = null;
@@ -26,7 +26,7 @@ public class MissileTrail : MonoBehaviour
         FollowMissile();
     }
 
-    private void FollowMissile()
+    void FollowMissile()
     {
         if (missile.gameObject.activeInHierarchy == false)
         {
@@ -37,7 +37,7 @@ public class MissileTrail : MonoBehaviour
         transform.position = missile.transform.position;
     }
 
-    private void WaitForDissolve()
+    void WaitForDissolve()
     {
         if (trail.positionCount == 0)
         {
@@ -47,16 +47,16 @@ public class MissileTrail : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
+    void LateUpdate()
     {
         update?.Invoke();
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         trail.emitting = true;
     }
-    private void OnDisable()
+    void OnDisable()
     {
         trail.Clear();
         trail.emitting = false;

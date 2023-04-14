@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   planeSpeed: 12
-  missileSpeed: 8
+  missileSpeed: 10
   missileSpawnRadius: 20
+  secondsToFever: 0
+  feverDuration: 0

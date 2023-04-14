@@ -7,10 +7,18 @@ public class MainInstaller : MonoInstaller
     {
         Container
             .Bind(typeof(UserInput),
+                  typeof(Plane),
                   typeof(CoinSpawner),
-                  typeof(Plane))
+                  typeof(MissileSpawner),
+                  typeof(ExplosionSpawner)
+            )
             .FromComponentInHierarchy()
             .AsSingle();
+
+        Container
+            .Bind<AutoDestruct>()
+            .FromComponentSibling()
+            .AsTransient();
 
         Container
             .Bind<ParticleSystem>()
@@ -26,7 +34,7 @@ public class MainInstaller : MonoInstaller
         Container
             .Bind<Explosive>()
             .FromComponentSibling()
-            .AsSingle();
+            .AsTransient();
 
         Container
             .BindFactory<Missile, Missile.Factory>()
@@ -47,5 +55,25 @@ public class MainInstaller : MonoInstaller
             .Bind<MissileTrail.Pool>()
             .FromNew()
             .AsCached();
+
+
+        Container
+            .BindFactory<Coin, Coin.Factory>()
+            .FromComponentInNewPrefabResource("Coin")
+            .AsCached()
+            .NonLazy();
+
+        Container
+            .BindFactory<ParticleSystem, ExplosionSpawner.ExplosionFactory>()
+            .FromComponentInNewPrefabResource("Explosion")
+            .AsCached()
+            .NonLazy();
+
+        Container
+            .Bind<Coin.ICoinVault>()
+            .To<Vault>()
+            .FromComponentInHierarchy()
+            .AsCached()
+            .Lazy();
     }
 }

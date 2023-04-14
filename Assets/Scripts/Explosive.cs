@@ -4,15 +4,10 @@ using Zenject;
 
 public class Explosive : MonoBehaviour
 {
-    [Inject] private ParticleSystem explosionPS;
-
-    public event Action onExplode;
+    [Inject] ExplosionSpawner explosionSpawner;
 
     public void Explode()
     {
-        explosionPS.transform.position = transform.position;
-        explosionPS.Emit(4);
-
-        onExplode?.Invoke();
+        explosionSpawner.Spawn(transform.position);
     }
 }

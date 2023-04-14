@@ -1,7 +1,22 @@
 mergeInto(LibraryManager.library,
           {
-            SendMessageToPlane: function () {
-              SendMessage('Plane', 'PlaneInitCallback');
+            ShowAd: function() {
+              ysdk.adv.showRewardedVideo({
+                callbacks: {
+                  onOpen: () => {
+                    console.log('Video ad open.');
+                  },
+                  onRewarded: () => {
+                    myGameInstance.SendMessage('Main Menu', 'Repair')
+                  },
+                  onClose: () => {
+                    console.log('Video ad closed.');
+                  },
+                  onError: (e) => {
+                    console.log('Error while open video ad:', e);
+                  }
+                }
+              })
             },
 
             Hello: function () {

@@ -8,8 +8,9 @@ public class MissileSpawner : MonoBehaviour
 
     float spawnRadius;
     float t = 0, interval = 3;
+    bool spawning;
 
-    private void Awake()
+    void Awake()
     {
         var gameSettings = GameSettings.Get();
         spawnRadius = gameSettings.missileSpawnRadius;
@@ -23,8 +24,9 @@ public class MissileSpawner : MonoBehaviour
 #endif
     }
 
-    private void Update()
+    void Update()
     {
+        if (spawning)
         if ((t += Time.deltaTime) >= interval)
         {
             t -= interval;
@@ -33,7 +35,7 @@ public class MissileSpawner : MonoBehaviour
         }
     }
 
-    private void Spawn()
+    void Spawn()
     {
         var missile = missilePool.Rent();
 
@@ -42,5 +44,18 @@ public class MissileSpawner : MonoBehaviour
         missile.transform.position =
             plane.transform.position
             + new Vector3(circlePosition.x, circlePosition.y, 0) * spawnRadius;
+    }
+
+    public void StartSpawn()
+    {
+        spawning = true;
+    }
+    public void StopSpawn()
+    {
+        spawning = false;
+    }
+    public void ClearPool()
+    {
+        missilePool.Clear();
     }
 }

@@ -68,13 +68,13 @@ public class Fever : MonoBehaviour
 
     private void NormalUpdate()
     {
-        if (missilesInRange == 0)
-        {
-            t -= Time.deltaTime * .5f;
-        }
-        else if (missilesInRange > 0)
+        if (missilesInRange > 0)
         {
             t += Time.deltaTime;
+        }
+        else if (missilesInRange == 0)
+        {
+            t -= Time.deltaTime * .5f;
         }
 
         indicator.fillAmount = t / secondsToFever;
@@ -96,6 +96,8 @@ public class Fever : MonoBehaviour
     private void FeverUpdate()
     {
         t -= Time.deltaTime;
+
+        indicator.fillAmount = t / feverDuration;
 
         if (t <= 0)
         {

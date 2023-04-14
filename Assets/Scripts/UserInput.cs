@@ -5,28 +5,36 @@ public class UserInput : MonoBehaviour
 {
     public event Action<Vector3> onTouch;
 
+    private const int maxDistance = 15;
     Vector3 pastFramePosition;
     Vector3 deltaPosition;
 
+    Vector3
+        startPoint,
+        dragPoint
+        ;
+
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            Vector3 mousePosition = Input.mousePosition;
+            startPoint = Input.mousePosition;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            dragPoint = Input.mousePosition;
 
-            var newDeltaPosition = mousePosition - pastFramePosition;
+            Vector3 path = (dragPoint - startPoint);
 
-            if (newDeltaPosition.magnitude < 10f)
+            Vector3 direction = path.normalized;
+            float distance = path.magnitude;
+
+            if (distance > maxDistance)
             {
-                return;
+                startPoint = Vector3.Lerp(startPoint, dragPoint, 1f - distance / maxDistance);
             }
 
-            deltaPosition = newDeltaPosition;
-           
-            pastFramePosition = mousePosition;
-
-            onTouch?.Invoke(deltaPosition);
-
+            onTouch?.Invoke(direction);
         }
     }
 }
