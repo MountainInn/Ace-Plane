@@ -10,7 +10,10 @@ public class MainInstaller : MonoInstaller
                   typeof(Plane),
                   typeof(CoinSpawner),
                   typeof(MissileSpawner),
-                  typeof(ExplosionSpawner)
+                  typeof(ExplosionSpawner),
+                  typeof(Vault),
+                  typeof(SkinContainer),
+                  typeof(MenuRadioGroup)
             )
             .FromComponentInHierarchy()
             .AsSingle();
@@ -75,5 +78,11 @@ public class MainInstaller : MonoInstaller
             .FromComponentInHierarchy()
             .AsCached()
             .Lazy();
+
+        Container
+            .Bind(typeof(Vendible),
+                  typeof(SkinSelect))
+            .FromComponentInHierarchy()
+            .AsTransient();
     }
 }

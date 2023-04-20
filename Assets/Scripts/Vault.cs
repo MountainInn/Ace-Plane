@@ -1,13 +1,11 @@
 using UnityEngine;
-using TMPro;
-using UniRx;
 using System;
 
 public class Vault : MonoBehaviour, Coin.ICoinVault
 {
-    int coins;
+    public int coins {get; protected set;}
 
-    static public event Action<int> onCoinsChanged;
+    public event Action<int> onCoinsChanged;
 
     public void EarnCoin(int amount)
     {

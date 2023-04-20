@@ -72,6 +72,9 @@ public class Missile : MonoBehaviour
         var direction = (target.position - transform.position).normalized;
         var force = speed * direction;
         rb.AddForce(force, ForceMode2D.Force);
+
+        var rot = Quaternion.LookRotation(Vector3.forward, rb.velocity.normalized);
+        rb.MoveRotation(rot);
     }
 
 

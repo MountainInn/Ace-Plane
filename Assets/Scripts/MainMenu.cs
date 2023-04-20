@@ -6,43 +6,29 @@ using UnityEngine.UI;
 using Zenject;
 using System.Linq;
 using System.Collections;
+using System;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField]
     Image
         continueWheel;
-   
-    [SerializeField]
-    Button
-        startGameButton,
-        repairButton,
-        endGameButton,
-        mainMenuButton;
 
     [SerializeField]
-    GameObject
-        screen,
+    RectTransform
         mainMenuContents,
         gameOverContents,
-        scoreContents;
+        scoreContents,
+        storeContents;
 
-    CoinSpawner coinSpawner;
-    MissileSpawner missileSpawner;
-    Plane plane;
-    UserInput userInput;
+    [Inject] CoinSpawner coinSpawner;
+    [Inject] MissileSpawner missileSpawner;
+    [Inject] Plane plane;
+    [Inject] UserInput userInput;
+    [Inject] MenuRadioGroup menuRadio;
 
     float autoContinueTimer = 3f;
     Coroutine autoContinueCoroutine;
-
-    [Inject]
-    public void Construct(CoinSpawner coinSpawner, MissileSpawner missileSpawner, Plane plane, UserInput userInput)
-    {
-        this.coinSpawner = coinSpawner;
-        this.missileSpawner = missileSpawner;
-        this.plane = plane;
-        this.userInput = userInput;
-    }
 
     void Start()
     {
@@ -50,31 +36,28 @@ public class MainMenu : MonoBehaviour
             .Subscribe(msg => ShowGameOver())
             .AddTo(this);
 
-        startGameButton.onClick.AddListener(()=>StartGame());
-        repairButton.onClick.AddListener(()=>Repair());
-        endGameButton.onClick.AddListener(()=>EndGame());
-        mainMenuButton.onClick.AddListener(()=>ShowMainMenu());
-
-        HideAllContents();
         ShowMainMenu();
     }
 
-
-    void StartGame()
+    public void ShowStore()
     {
-        HideAllContents();
+        menuRadio.RadioToggle(storeContents);
+    }
 
+    public void StartGame()
+    {
         missileSpawner.StartSpawn();
 
         userInput.gameObject.SetActive(true);
+
+        menuRadio.AllToggleOff();
     }
 
     void ShowGameOver()
     {
-        HideAllContents();
-
-        screen.SetActive(true);
-        gameOverContents.gameObject.SetActive(true);
+        Debug.Log($"showGameObver");
+        
+        menuRadio.RadioToggle(gameOverContents);
 
         userInput.gameObject.SetActive(false);
 
@@ -99,9 +82,9 @@ public class MainMenu : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void ShowAd();
 
-    void Repair()
+    public void Repair()
     {
-        HideAllContents();
+        menuRadio.AllToggleOff();
 
         plane.Repair();
 
@@ -112,20 +95,19 @@ public class MainMenu : MonoBehaviour
         StopCoroutine(autoContinueCoroutine);
     }
 
-    void EndGame()
+    public void EndGame()
     {
         FindObjectsOfType<Missile>()
             .ToList()
             .ForEach(m => m.Explode());
 
-        plane.Explode();
-
         missileSpawner.StopSpawn();
         coinSpawner.ClearPool();
 
-        Invoke(nameof(ShowScore), 1.5f);
+        menuRadio.AllToggleOff();
 
-        HideAllContents();
+        StopCoroutine(autoContinueCoroutine);
+        Invoke(nameof(ShowScore), 1.5f);
 
         userInput.gameObject.SetActive(false);
 
@@ -134,30 +116,17 @@ public class MainMenu : MonoBehaviour
 
     void ShowScore()
     {
-        HideAllContents();
-
-        screen.SetActive(true);
-        scoreContents.gameObject.SetActive(true);
+        menuRadio.RadioToggle(scoreContents);
         userInput.gameObject.SetActive(false);
     }
 
-    void ShowMainMenu()
+    public void ShowMainMenu()
     {
-        HideAllContents();
-
+        menuRadio.RadioToggle(mainMenuContents);
+       
         plane.Steer(Vector3.up);
         plane.Repair();
 
-        screen.SetActive(true);
-        mainMenuContents.SetActive(true);
         userInput.gameObject.SetActive(false);
-    }
-
-    void HideAllContents()
-    {
-        screen.SetActive(false);
-        gameOverContents.SetActive(false);
-        mainMenuContents.SetActive(false);
-        scoreContents.SetActive(false);
     }
 }
