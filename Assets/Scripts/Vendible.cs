@@ -5,30 +5,32 @@ using Zenject;
 
 public class Vendible : MonoBehaviour
 {
-    [SerializeField] int cost;
+    [SerializeField] public int cost;
 
     [Inject] Vault vault;
 
+    public bool isAffordable {get; protected set;}
+    public bool isBought {get; protected set;}
 
-
-    public bool bought {get; protected set;}
-
-    public event Action<bool> onUpdateAffordable;
+    public event Action<bool> onUpdateAffordable, onBought;
 
     void Start()
     {
-        vault.onCoinsChanged += UpdateInteractable;
+        vault.onCoinsChanged += UpdateAffordable;
+        UpdateAffordable(vault.coins);
     }
 
     public void Buy()
     {
         vault.SpendCoin(cost);
-        bought = true;
+        isBought = true;
+
+        onBought?.Invoke(isBought);
     }
 
-    void UpdateInteractable(int currentCoins)
+    void UpdateAffordable(int currentCoins)
     {
-        bool canAfford = currentCoins >= cost;
-        onUpdateAffordable?.Invoke(canAfford);
+        isAffordable = ( currentCoins >= cost );
+        onUpdateAffordable?.Invoke(isAffordable);
     }
 }

@@ -11,11 +11,11 @@ public class SkinSelect_RadioGroup : RadioGroup<SkinSelect>
 
     protected override void ToggleOn(SkinSelect obj)
     {
-        Debug.Log($"Selected Skin: {obj.skin.name}");
+        obj.ToggleSelection(true);
     }
 
     protected override void ToggleOff(SkinSelect obj)
     {
-        Debug.Log($"Deselected Skin: {obj.skin.name}");
+        obj.ToggleSelection(false);
     }
 }

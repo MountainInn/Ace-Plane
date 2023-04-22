@@ -3,7 +3,7 @@ using System;
 
 public class Vault : MonoBehaviour, Coin.ICoinVault
 {
-    public int coins {get; protected set;}
+    public int coins;
 
     public event Action<int> onCoinsChanged;
 
