@@ -32,6 +32,7 @@ public class MainInstaller : MonoInstaller
 
         Container
             .Bind<Missile.ILockOnTarget>()
+            .To<Plane>()
             .FromComponentInHierarchy()
             .WhenInjectedInto<Missile>()
             .Lazy();

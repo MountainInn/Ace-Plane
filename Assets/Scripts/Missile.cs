@@ -8,36 +8,18 @@ public class Missile : MonoBehaviour
 {
     public interface ILockOnTarget
     {
+        Transform transform {get;}
     }
 
     private Rigidbody2D rb;
     private float speed;
 
-    private Transform target;
-    private CoinSpawner coinSpawner;
-    private ExplosionSpawner explosionSpawner;
-    private AutoDestruct autoDestruct;
-    private MissilePool missilePool;
-    private MissileTrail.Pool trailPool;
-
-    [Inject]
-    public void Construct(Plane plane,
-                          CoinSpawner coinSpawner,
-                          MissilePool missilePool,
-                          ExplosionSpawner explosionSpawner,
-                          MissileTrail.Pool trailPool,
-                          AutoDestruct autoDestruct)
-    {
-        this.missilePool = missilePool;
-        this.trailPool = trailPool;
-        this.coinSpawner = coinSpawner;
-        this.explosionSpawner = explosionSpawner;
-        this.autoDestruct = autoDestruct;
-
-        autoDestruct.onAutoDestruct += ExplodeWithCoin;
-
-        target = ((MonoBehaviour) plane).transform;
-    }
+    [Inject] private ILockOnTarget target;
+    [Inject] private CoinSpawner coinSpawner;
+    [Inject] private ExplosionSpawner explosionSpawner;
+    [Inject] private AutoDestruct autoDestruct;
+    [Inject] private MissilePool missilePool;
+    [Inject] private MissileTrail.Pool trailPool;
 
     private void Awake()
     {
@@ -45,6 +27,8 @@ public class Missile : MonoBehaviour
 
         var gameSettings = GameSettings.Get();
         speed = gameSettings.missileSpeed;
+
+        autoDestruct.onAutoDestruct += ExplodeWithCoin;
 
 #if UNITY_EDITOR
         gameObject.AddComponent<GameSettingsWatcher>()
@@ -69,7 +53,7 @@ public class Missile : MonoBehaviour
 
     private void Home()
     {
-        var direction = (target.position - transform.position).normalized;
+        var direction = (target.transform.position - transform.position).normalized;
         var force = speed * direction;
         rb.AddForce(force, ForceMode2D.Force);
 
