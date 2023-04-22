@@ -19,6 +19,7 @@ public class Coin : MonoBehaviour
         if (col.TryGetComponent(out Plane plane))
         {
             coinVault.EarnCoin(1);
+            MessageBroker.Default.Publish(new Score.msgScoreChange{ amount = 10 });
         }
     }
 

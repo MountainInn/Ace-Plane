@@ -13,7 +13,8 @@ public class MainInstaller : MonoInstaller
                   typeof(ExplosionSpawner),
                   typeof(Vault),
                   typeof(SkinContainer),
-                  typeof(MenuRadioGroup)
+                  typeof(MenuRadioGroup),
+                  typeof(Score)
             )
             .FromComponentInHierarchy()
             .AsSingle();

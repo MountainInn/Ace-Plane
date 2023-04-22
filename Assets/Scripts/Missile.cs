@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Zenject;
 using UniRx.Toolkit;
-
+using UniRx;
 
 public class Missile : MonoBehaviour
 {
@@ -95,6 +95,8 @@ public class Missile : MonoBehaviour
     {
         Explode();
         coinSpawner.Spawn(transform.position);
+
+        MessageBroker.Default.Publish(new Score.msgScoreChange{ amount = 5 });
     }
 
     public void Explode()
@@ -104,6 +106,7 @@ public class Missile : MonoBehaviour
         missilePool.Return(this);
     }
 
+    public struct msgExploded {  }
 
 
     public class MissilePool : ObjectPool<Missile>

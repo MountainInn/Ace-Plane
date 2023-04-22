@@ -26,6 +26,7 @@ public class MainMenu : MonoBehaviour
     [Inject] Plane plane;
     [Inject] UserInput userInput;
     [Inject] MenuRadioGroup menuRadio;
+    [Inject] Score score;
 
     float autoContinueTimer = 3f;
     Coroutine autoContinueCoroutine;
@@ -51,6 +52,8 @@ public class MainMenu : MonoBehaviour
         userInput.gameObject.SetActive(true);
 
         menuRadio.AllToggleOff();
+
+        score.Reset();
     }
 
     void ShowGameOver()
