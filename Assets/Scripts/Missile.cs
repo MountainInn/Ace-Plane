@@ -8,6 +8,7 @@ public class Missile : MonoBehaviour
 {
     public interface ILockOnTarget
     {
+        bool isTargetable{get;}
         Transform transform {get;}
     }
 
@@ -39,16 +40,16 @@ public class Missile : MonoBehaviour
 #endif
     }
 
-    private void Update()
-    {
-        if (target is null) return;
-
-        Home();
-    }
-
     private void OnEnable()
     {
         trailPool.Rent().SetMissile(this);
+    }
+
+    private void Update()
+    {
+        if (!target.isTargetable) return;
+
+        Home();
     }
 
     private void Home()

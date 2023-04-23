@@ -18,6 +18,8 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     private Quaternion rot;
     private bool isOperable = true;
 
+    public bool isTargetable => isOperable;
+
     [Inject]
     public void Construct(UserInput userInput)
     {
