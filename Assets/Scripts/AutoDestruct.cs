@@ -5,7 +5,7 @@ using System.Collections;
 
 public class AutoDestruct : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer render;
+    [SerializeField] MeshRenderer render;
 
     public event Action onAutoDestruct;
 
@@ -19,9 +19,9 @@ public class AutoDestruct : MonoBehaviour
 
     void Awake()
     {
-        render = GetComponent<SpriteRenderer>();
+        render = GetComponent<MeshRenderer>();
 
-        baseColor = render.color;
+        baseColor = render.material.color;
         flashColor = Color.Lerp(baseColor, Color.white, .75f);
     }
 
@@ -43,8 +43,8 @@ public class AutoDestruct : MonoBehaviour
                 float duration = l / flashingThreshold / 2;
                 sequence =
                     DOTween.Sequence()
-                    .Append(render.DOColor(flashColor, duration))
-                    .Append(render.DOColor(baseColor, duration))
+                    .Append(render.material.DOColor(flashColor, duration))
+                    .Append(render.material.DOColor(baseColor, duration))
                     .OnKill(() => sequence = null)
                     .Play();
             }
