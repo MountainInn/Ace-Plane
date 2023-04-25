@@ -6,12 +6,9 @@ using TMPro;
 public class SkinSelect : MonoBehaviour
 {
     [SerializeField] public Skin skin;
+    [SerializeField] public SkinContainer skinContainer;
     [SerializeField] public Color selectionColor;
 
-    [Inject] Vault vault;
-    [Inject] SkinContainer skinContainer;
-
-    SkinSelect skinSelect;
     SkinSelect_RadioGroup skinSelectRadio;
     Vendible vendible;
     Button button;
@@ -20,22 +17,18 @@ public class SkinSelect : MonoBehaviour
 
     void Awake()
     {
-        skinSelect = GetComponent<SkinSelect>();
         skinSelectRadio = GetComponentInParent<SkinSelect_RadioGroup>();
-        vendible = GetComponent<Vendible>();
+
+        vendible =
+            GetComponent<Vendible>()
+            .Initialize(UpdateInteractable);
+
         button = GetComponent<Button>();
-        buttonImage = GetComponent<Image>();
-        costText = GetComponentInChildren<TextMeshProUGUI>();
-    }
-
-    void Start()
-    {
-        vendible.onUpdateAffordable += (_) => UpdateInteractable();
-        vendible.onBought += (_) => UpdateInteractable();
-        UpdateInteractable();
-
         button.onClick.AddListener(OnClick);
 
+        buttonImage = GetComponent<Image>();
+
+        costText = GetComponentInChildren<TextMeshProUGUI>();
         costText.text = vendible.cost.ToString();
     }
 
@@ -53,7 +46,7 @@ public class SkinSelect : MonoBehaviour
             vendible.Buy();
         }
 
-        skinSelect.SelectSkin();
+        SelectSkin();
     }
 
     public void SelectSkin()
