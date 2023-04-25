@@ -20,6 +20,13 @@ public class Vendible : MonoBehaviour
         UpdateAffordable(vault.coins);
     }
 
+    public void Initialize(Action updateInteractable)
+    {
+        vendible.onUpdateAffordable += (_) => updateInteractable.Invoke();
+        vendible.onBought += (_) => updateInteractable.Invoke();
+        updateInteractable.Invoke();
+    }
+
     public void Buy()
     {
         vault.SpendCoin(cost);
