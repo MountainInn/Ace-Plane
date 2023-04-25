@@ -14,7 +14,9 @@ public class MenuRadioGroup : RadioGroup<RectTransform>
 
         for (int i = 0; i < transform.childCount; i++)
         {
-            radios.Add(transform.GetChild(i).GetComponent<RectTransform>());
+            radios.Add(transform
+                       .GetChild(i)
+                       .GetComponent<RectTransform>());
         }
     }
 
