@@ -6,7 +6,7 @@ using TMPro;
 public class SkinSelect : MonoBehaviour
 {
     [SerializeField] public Skin skin;
-    [SerializeField] public SkinContainer skinContainer;
+    [Space]
     [SerializeField] public Color selectionColor;
 
     SkinSelect_RadioGroup skinSelectRadio;
@@ -19,9 +19,8 @@ public class SkinSelect : MonoBehaviour
     {
         skinSelectRadio = GetComponentInParent<SkinSelect_RadioGroup>();
 
-        vendible =
-            GetComponent<Vendible>()
-            .Initialize(UpdateInteractable);
+        vendible = GetComponent<Vendible>();
+        vendible.Initialize(UpdateInteractable);
 
         button = GetComponent<Button>();
         button.onClick.AddListener(OnClick);
@@ -51,7 +50,19 @@ public class SkinSelect : MonoBehaviour
 
     public void SelectSkin()
     {
-        skinContainer.SetSkin(skin);
+        SkinSlot[] skinSlots = skin.subtype switch
+            {
+                Skin.Subtype.plane => FindObjectsOfType<Plane_SkinSlot>(),
+                Skin.Subtype.engine => FindObjectsOfType<Engine_SkinSlot>(),
+
+                (_) => throw new System.ArgumentException()
+            };
+
+        foreach(var item in skinSlots)
+        {
+            item.SetSkin(skin);
+        }
+
         skinSelectRadio.RadioToggle(this);
     }
 

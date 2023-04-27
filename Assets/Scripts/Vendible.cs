@@ -22,8 +22,8 @@ public class Vendible : MonoBehaviour
 
     public void Initialize(Action updateInteractable)
     {
-        vendible.onUpdateAffordable += (_) => updateInteractable.Invoke();
-        vendible.onBought += (_) => updateInteractable.Invoke();
+        onUpdateAffordable += (_) => updateInteractable.Invoke();
+        onBought += (_) => updateInteractable.Invoke();
         updateInteractable.Invoke();
     }
 

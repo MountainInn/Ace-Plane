@@ -12,7 +12,7 @@ public class MainInstaller : MonoInstaller
                   typeof(MissileSpawner),
                   typeof(ExplosionSpawner),
                   typeof(Vault),
-                  typeof(SkinContainer),
+                  typeof(SkinSlot),
                   typeof(MenuRadioGroup),
                   typeof(Score)
             )
