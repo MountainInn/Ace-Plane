@@ -16,7 +16,7 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.GetComponentInParent<Plane>() is not null)
+        if (col.GetComponentInParent<Plane>())
         {
             coinVault.EarnCoin(1);
             MessageBroker.Default.Publish(new Score.msgScoreChange{ amount = 10 });

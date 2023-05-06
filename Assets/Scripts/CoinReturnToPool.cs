@@ -8,7 +8,7 @@ public class CoinReturnToPool : ReturnToPool<Coin>
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.TryGetComponent(out Plane plane))
+        if (col.GetComponentInParent<Plane>())
         {
             pool.Release(gameObject);
         }

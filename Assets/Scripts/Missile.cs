@@ -69,7 +69,7 @@ public class Missile : MonoBehaviour
         {
             ExplodeWithCoin();
         }
-        else if (col.TryGetComponent(out Plane plane))
+        else if (col.GetComponentInParent<Plane>())
         {
             Explode();
         }
