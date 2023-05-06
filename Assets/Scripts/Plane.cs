@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 using System.Runtime.InteropServices;
 using UniRx;
+using System.Collections.Generic;
 
 public class Plane : MonoBehaviour, Missile.ILockOnTarget
 {
@@ -12,7 +14,7 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     private static extern void Hello();
 
     private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
+    private List<MeshRenderer> meshRenderers;
     private float speed;
     private Vector2 direction = Vector2.up;
     private Quaternion rot;
@@ -21,15 +23,21 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     public bool isTargetable => isOperable;
 
     [Inject]
-    public void Construct(UserInput userInput)
+    public void Construct(UserInput userInput, Wardrobe wardrobe)
     {
         userInput.onTouch += Steer;
+        wardrobe.onPlaneSkinChanged += FindMeshRenderers;
+    }
+
+    private void FindMeshRenderers()
+    {
+        meshRenderers = GetComponentsInChildren<MeshRenderer>().ToList();
     }
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        FindMeshRenderers();
 
         var gameSettings = GameSettings.Get();
         speed = gameSettings.planeSpeed;
@@ -80,7 +88,7 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
     {
         explosionSpawner.Spawn(transform.position);
 
-        spriteRenderer.enabled = false;
+        meshRenderers.ForEach(r => r.enabled = false);
         isOperable = false;
         rb.simulated = false;
 
@@ -89,7 +97,7 @@ public class Plane : MonoBehaviour, Missile.ILockOnTarget
 
     public void Repair()
     {
-        spriteRenderer.enabled = true;
+        meshRenderers.ForEach(r => r.enabled = true);
         isOperable = true;
         rb.simulated = true;
     }
