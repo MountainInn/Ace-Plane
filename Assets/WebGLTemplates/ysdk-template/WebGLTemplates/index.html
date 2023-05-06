@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en-us">
+<head><meta charset="utf-8">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <style>
+    html { box-sizing: border-box; }
+    *,
+    *:before,
+    *:after { box-sizing: inherit; }
+    body { margin: 0; background: #444; }
+    #unity-canvas { width: 100vw; height: 100vh; }
+    canvas { width: 100%; height: 100%; display: block; }
+    </style>
+</head>
+<body><canvas id="unity-canvas"></canvas></body>
+<script>
+var buildUrl = "Build";
+var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+var config = {
+    dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+    frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+    codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#if MEMORY_FILENAME
+    memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+    symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+    streamingAssetsUrl: "StreamingAssets",
+    companyName: "{{{ COMPANY_NAME }}}",
+    productName: "{{{ PRODUCT_NAME }}}",
+    productVersion: "{{{ PRODUCT_VERSION }}}",
+};
+ 
+var canvas = document.querySelector("#unity-canvas");
+var unityGame;
+var script = document.createElement("script");
+script.src = loaderUrl;
+script.onload = () => {
+    createUnityInstance(canvas, config, (progress) => {
+    }).then((unityInstance) => {
+        unityGame = unityInstance;
+    }).catch((message) => {
+        alert(message);
+    });
+};
+document.body.appendChild(script);
+ 
+function getTrainingParams() {
+    let trainingParams = window.parent['getTrainingParams']();
+    unityGame.SendMessage('EventSystem', 'receiveData', JSON.stringify(trainingParams));
+}
+</script>
+</html>

@@ -18,16 +18,16 @@ public class SkinSelect : MonoBehaviour
     void Awake()
     {
         skinSelectRadio = GetComponentInParent<SkinSelect_RadioGroup>();
-
-        vendible = GetComponent<Vendible>();
-        vendible.Initialize(UpdateInteractable);
-
         button = GetComponent<Button>();
-        button.onClick.AddListener(OnClick);
-
+        vendible = GetComponent<Vendible>();
         buttonImage = GetComponent<Image>();
-
         costText = GetComponentInChildren<TextMeshProUGUI>();
+    }
+
+    void Start()
+    {
+        button.onClick.AddListener(OnClick);
+        vendible.Initialize(UpdateInteractable);
         costText.text = vendible.cost.ToString();
     }
 

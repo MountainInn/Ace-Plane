@@ -2,27 +2,28 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class AutoDestruct : MonoBehaviour
 {
-    [SerializeField] MeshRenderer render;
+    [SerializeField] List<MeshRenderer> meshRenderers;
 
     public event Action onAutoDestruct;
 
     float lifetime = 10;
-    float flashingThreshold = 4;
+    float flashingThreshold = 10;
 
     Coroutine countdownCoroutine;
 
-    Color baseColor, flashColor;
     Sequence sequence;
+    private int tProperty;
 
     void Awake()
     {
-        render = GetComponent<MeshRenderer>();
+        meshRenderers = GetComponentsInChildren<MeshRenderer>().ToList();
 
-        baseColor = render.material.color;
-        flashColor = Color.Lerp(baseColor, Color.white, .75f);
+        tProperty = Shader.PropertyToID("_t");
     }
 
     void OnEnable()
@@ -41,10 +42,18 @@ public class AutoDestruct : MonoBehaviour
             if (l <= flashingThreshold && sequence == null)
             {
                 float duration = l / flashingThreshold / 2;
-                sequence =
-                    DOTween.Sequence()
-                    .Append(render.material.DOColor(flashColor, duration))
-                    .Append(render.material.DOColor(baseColor, duration))
+
+                sequence = DOTween.Sequence();
+
+                for (int i = 0; i < meshRenderers.Count; i++)
+                {
+                    MeshRenderer render  = meshRenderers[i];
+                    sequence
+                        .Append(render.material.DOFloat(.75f, tProperty, duration))
+                        .Append(render.material.DOFloat(.0f, tProperty, duration));
+                }
+
+                sequence
                     .OnKill(() => sequence = null)
                     .Play();
             }
@@ -56,7 +65,10 @@ public class AutoDestruct : MonoBehaviour
     void OnDisable()
     {
         StopCoroutine(countdownCoroutine);
-        render.DOKill();
+        foreach(var render in meshRenderers)
+        {
+            render.DOKill();
+        }
         sequence = null;
     }
 }
