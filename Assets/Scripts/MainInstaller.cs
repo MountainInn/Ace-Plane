@@ -86,5 +86,10 @@ public class MainInstaller : MonoInstaller
                   typeof(SkinSelect))
             .FromComponentInHierarchy()
             .AsTransient();
+
+        Container
+            .Bind(typeof(Wardrobe))
+            .FromResource("Wardrobe")
+            .AsSingle();
     }
 }
